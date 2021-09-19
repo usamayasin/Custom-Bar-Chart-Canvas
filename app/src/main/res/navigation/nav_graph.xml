@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.afiniti.kiosk.scalabletask.ui.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/home_fragment" >
+        <action
+            android:id="@+id/toRepoDetailFragment"
+            app:destination="@id/repoDetailFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/repoDetailFragment"
+        android:name="com.afiniti.kiosk.scalabletask.ui.detail.RepoDetailFragment"
+        android:label="fragment_repo_detail"
+        tools:layout="@layout/repo_detail_fragment">
+        <argument
+            android:name="repoName"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
+
+</navigation>
