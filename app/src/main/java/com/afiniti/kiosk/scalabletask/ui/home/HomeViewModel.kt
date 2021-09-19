@@ -17,7 +17,11 @@ class HomeViewModel @Inject constructor( private val repository: Repository) : V
     private val reposMutableLiveData = MutableLiveData<List<RepoModel>>()
     val repoLiveData: LiveData<List<RepoModel>> = reposMutableLiveData
 
-    fun fetchRepos() {
+    init{
+        fetchRepos()
+    }
+
+    private fun fetchRepos() {
         disposables.add(
             repository.getPublicRepos()
                 .subscribeOn(Schedulers.io())
