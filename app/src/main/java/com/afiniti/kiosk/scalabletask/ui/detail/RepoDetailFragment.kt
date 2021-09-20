@@ -4,9 +4,7 @@ import android.content.Context
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.DisplayMetrics
 import android.view.*
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,6 +22,8 @@ import kotlin.concurrent.fixedRateTimer
 
 
 class RepoDetailFragment : Fragment() {
+
+    private var maxCommitsCount: Int = -1
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -63,33 +63,16 @@ class RepoDetailFragment : Fragment() {
     private fun setUpUi(commitsList: List<Pair<String, Int>>) {
         var index = 0
         var barHeight: Float
-
-        var screenHeight = getScreenDimension()
-
-        println("Screen Height  -> " + screenHeight.toFloat())
-
+        var percentageAsPerMax = -1
+        var initialHeight = -1f
+        mBinding.cvBar.setScreenHeight(getDeviceHeight().toFloat())
         fixedRateTimer("timer", false, 0, 2000) {
             activity?.runOnUiThread {
                 if (index < commitsList.size) {
-//                    barHeight = if (commitsList[index].second < 15)
-//                        (screenHeight - (commitsList[index].second * 100)).toFloat()
-//                    else
-//                        (screenHeight - ((commitsList[index].second * 100) / 10)).toFloat()
-                    var commitsPercentage = 0f
-                    var screenSize = 0f
-                    if (commitsList[index].second > 100) {
-                        commitsPercentage = (commitsList[index].second.toFloat() / 100f).toFloat()
-                        screenSize = (screenHeight.toFloat() / 100f).toFloat()
-                    } else {
-                        commitsPercentage = commitsList[index].second.toFloat()
-                        screenSize =  screenHeight.toFloat() - 10f
-                    }
-
-                    barHeight = (screenSize.toFloat() * commitsPercentage).toFloat()
-
+                    percentageAsPerMax = (commitsList[index].second * 100) / maxCommitsCount
+                    initialHeight = (((1000) / 100) * percentageAsPerMax).toFloat()
+                    barHeight = (1000) - initialHeight
                     mBinding.cvBar.setBarHeight(barHeight)
-                    mBinding.cvBar.setScreenHeight(screenHeight.toFloat())
-
                     mBinding.tvMonth.text = commitsList[index].first
                     mBinding.tvCommitCount.text = "${commitsList[index].second} Commits"
                     index++
@@ -126,13 +109,13 @@ class RepoDetailFragment : Fragment() {
                 }
             }
         }
-        commitCountHashMap.clear()
-        commitCountHashMap.put("Aug", 750)
-        commitCountHashMap.put("Dec", 20)
-        commitCountHashMap.put("Jan", 350)
-        commitCountHashMap.put("Nov", 150)
-        commitCountHashMap.put("Feb", 1)
+        filterMaximumCommitCount(commitCountHashMap)
         return commitCountHashMap
+    }
+
+    private fun filterMaximumCommitCount(commitCountHashMap: HashMap<String, Int>) {
+        val maxValue = commitCountHashMap.values.maxOrNull()
+        maxCommitsCount = maxValue ?: 10
     }
 
     private fun getMonthFromDate(originalDate: String): String {
@@ -146,7 +129,7 @@ class RepoDetailFragment : Fragment() {
         return ""
     }
 
-    private fun getScreenDimension(): Int {
+    private fun getDeviceHeight(): Int {
         val displayManager = activity?.getSystemService<DisplayManager>()!!
         val defaultDisplay = displayManager.getDisplay(Display.DEFAULT_DISPLAY)
         return defaultDisplay.height

@@ -47,20 +47,12 @@ class CustomBarView : View {
         paint.color = Color.GREEN
     }
 
-    fun swapColor() {
-        BAR_HEIGHT = when (BAR_HEIGHT) {
-            1350f -> 10f
-            else -> 1350f
-        }
-        postInvalidate()
-    }
-
     fun setBarHeight(barHeight: Float) {
         BAR_HEIGHT = barHeight
         invalidate()
     }
 
-    fun setScreenHeight(screenHeight: Float) {
+    fun setScreenHeight(screenHeight: Float){
         SCREEN_HEIGHT = screenHeight
         invalidate()
     }
